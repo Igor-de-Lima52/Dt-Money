@@ -23,8 +23,8 @@ export default function RootLayout({
       lang="en"
       className={`${roboto.variable} h-full antialiased`}
     >
-      <body className="min-h-screen flex flex-col items-center justify-center p-4 gap-10">
-        <Image src="/logo.svg" alt="DT Money" width={200} height={50} className="-mt-16 -ml-5" />
+      <body className="min-h-screen flex flex-col items-center justify-center md:overflow-hidden">
+        <Image src="/logo.svg" alt="DT Money" width={200} height={50} className="mb-10 -ml-8 w-auto h-8 md:h-auto" />
         {children}
       </body>
     </html>
