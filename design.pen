@@ -1,0 +1,61 @@
+{
+  "version": "2.11",
+  "children": [
+    {
+      "type": "rectangle",
+      "id": "IzrcW",
+      "x": -1025,
+      "y": 147,
+      "fill": {
+        "type": "image",
+        "enabled": true,
+        "url": "DT%20Money%201.jpg",
+        "mode": "fill"
+      },
+      "width": 1920,
+      "height": 853
+    },
+    {
+      "type": "rectangle",
+      "id": "f7twbh",
+      "x": -1025,
+      "y": 929,
+      "fill": {
+        "type": "image",
+        "enabled": true,
+        "url": "DT%20Money%202.jpg",
+        "mode": "fill"
+      },
+      "width": 1920,
+      "height": 476
+    },
+    {
+      "type": "rectangle",
+      "id": "T8eNGp",
+      "x": 1007,
+      "y": 1079,
+      "fill": {
+        "type": "image",
+        "enabled": true,
+        "url": "Dt%20Money%203.jpg",
+        "mode": "fill"
+      },
+      "width": 1920,
+      "height": 850
+    },
+    {
+      "type": "rectangle",
+      "id": "zcdp1",
+      "x": 1073,
+      "y": 78,
+      "fill": {
+        "type": "image",
+        "enabled": true,
+        "url": "Dt%20Money%204.jpg",
+        "mode": "fill"
+      },
+      "width": 1920,
+      "height": 851
+    }
+  ]
+}
