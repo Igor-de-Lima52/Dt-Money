@@ -9,19 +9,19 @@ const roboto = Roboto({
 });
 
 export const metadata: Metadata = {
-  title: "Dt-Money - Login",
+  title: "Dt-Money - Sign Up",
   description: "Gerencie suas finanças de forma simples e eficiente com o Dt-Money, a aplicação de controle financeiro que te ajuda a organizar suas despesas e receitas em um só lugar.",
 };
 
-export default function SignInLayout({
+export default function SignUpLayout({
   children,
 }: Readonly<{
   children: React.ReactNode;
 }>) {
   return (
-      <>
-        <Image src="/logo.svg" alt="DT Money" width={200} height={50} className="mb-10 -ml-8 w-auto h-8 md:h-auto" />
-        {children}
-      </>
+    <>
+      <Image src="/logo.svg" alt="DT Money" width={200} height={50} className="mb-6 -ml-8 w-auto h-8 md:h-auto mt-6 md:mt-0" />
+      {children}
+    </>
   );
 }

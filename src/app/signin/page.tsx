@@ -1,63 +1,74 @@
-import Image from "next/image";
+"use client"
+
+import { z } from "zod";
+import Button from "../components/ui/Button"
+import { FormContainer, FormDescription, FormLink, FormSign, FormTitle } from "../components/FormSign"
+import { InputContainer, LabelContainer } from "../components/ui/Input"
+import { zodResolver } from "@hookform/resolvers/zod";
+import { useForm } from "react-hook-form";
+import { useRouter } from "next/navigation";
+import { useAuth } from "../contexts/auth-context";
+
+const schema = z.object({
+  email: z.email({ error: "E-mail inválido" }),
+  password: z.string().min(8, { error: "A senha deve conter pelo menos 8 caracteres." })
+})
+
+type LoginFormData = z.infer<typeof schema>
 
 export default function Login() {
+  const { signIn } = useAuth();
+  
+  const { register, handleSubmit, formState: { errors } } = useForm<LoginFormData>({
+    resolver: zodResolver(schema)
+  })
+
+  const router = useRouter();
+
+  async function onSubmit(data: LoginFormData) {
+    try {
+      await signIn(data.email, data.password);
+      router.push("/");
+    } catch {
+      alert("E-mail e/ou senha incorretos!")
+    }
+  }
+
+  function handleNavigate(e: React.MouseEvent<HTMLElement>, route: string) {
+    e.preventDefault();
+    router.push(route);
+  }
   return (
-        <div className="bg-[#29292e] rounded-[6px] p-8 md:p-12 max-w-[450px] w-full">
-          <h1 className="font-['Roboto:Bold',sans-serif] font-bold text-[#e1e1e6] text-[28px] mb-2" style={{ fontVariationSettings: "'wdth' 100" }}>
-            Bem-vindo de volta
-          </h1>
-          <p className="font-['Roboto:Regular',sans-serif] text-[#c4c4cc] text-base mb-8">
-            Faça login para continuar
-          </p>
-
-          <form className="flex flex-col gap-4">
-            <div>
-              <label className="font-['Roboto:Regular',sans-serif] text-[#c4c4cc] text-sm mb-2 block">
-                E-mail
-              </label>
-              <input
-                type="email"
-                // value={email}
-                // onChange={(e) => setEmail(e.target.value)}
-                placeholder="seu@email.com"
-                required
-                className="w-full bg-[#121214] border-0 rounded-[6px] px-4 py-3 text-[#e1e1e6] font-['Roboto:Regular',sans-serif] placeholder:text-[#7c7c8a] focus:outline-none focus:ring-2 focus:ring-[#00b37e]"
-              />
-            </div>
-
-            <div>
-              <label className="font-['Roboto:Regular',sans-serif] text-[#c4c4cc] text-sm mb-2 block">
-                Senha
-              </label>
-              <input
-                type="password"
-                // value={password}
-                // onChange={(e) => setPassword(e.target.value)}
-                placeholder="••••••••"
-                required
-                className="w-full bg-[#121214] border-0 rounded-[6px] px-4 py-3 text-[#e1e1e6] font-['Roboto:Regular',sans-serif] placeholder:text-[#7c7c8a] focus:outline-none focus:ring-2 focus:ring-[#00b37e]"
-              />
-            </div>
-
-            <button
-              type="submit"
-              className="w-full bg-[#00875f] hover:bg-[#015f43] transition-colors text-white font-['Roboto:Bold',sans-serif] font-bold py-4 rounded-[6px] mt-4"
-            >
-              Entrar
-            </button>
-          </form>
-
-          <div className="mt-6 text-center">
-            <p className="font-['Roboto:Regular',sans-serif] text-[#c4c4cc] text-sm">
-              Não tem uma conta?{" "}
-              <button
-                // onClick={() => navigate("/register")}
-                className="text-[#00b37e] hover:text-[#00875f] font-bold transition-colors"
-              >
-                Cadastre-se
-              </button>
-            </p>
-          </div>
+    <FormContainer>
+      <FormTitle>Bem-vindo de volta!</FormTitle>
+      <FormDescription>Faça login para continuar</FormDescription>
+      <FormSign onSubmit={handleSubmit(onSubmit)} noValidate>
+        <div>
+          <LabelContainer htmlFor="email">E-mail</LabelContainer>
+          <InputContainer placeholder="seu@email.com" type="email" required id="email" {...register("email")} // value={email} onChange={(e) => setEmail(e.target.value)} 
+          />
+          {errors.email && (
+            <span className="text-red-700 text-xs">{errors.email.message}</span>
+          )}
         </div>
+        <div>
+          <LabelContainer htmlFor="password">Senha</LabelContainer>
+          <InputContainer placeholder="••••••••" type="password" required id="password" {...register("password")} // value={password} onChange={(e) => setPassword(e.target.value)} 
+          />
+          {errors.password && (
+            <span className="text-red-700 text-xs">{errors.password.message}</span>
+          )}
+        </div>
+        <Button type="submit">Entrar</Button>
+        <FormLink>
+          <button
+            onClick={(e) => handleNavigate(e, "/signup")}
+            className="cursor-pointer text-[#00b37e] hover:text-[#00875f] font-bold transition-colors"
+          >
+            Cadastre-se
+          </button>
+        </FormLink>
+      </FormSign>
+    </FormContainer>
   );
 }

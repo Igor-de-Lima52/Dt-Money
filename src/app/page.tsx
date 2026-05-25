@@ -1,7 +1,7 @@
 import Header from "./components/Header";
-import MoneyCard from "./components/MoneyCard";
-import DoubleCardSection from "./components/DoubleCardSection";
-import TransactionsSection from "./components/TransactionsSection";
+import MoneyCard from "./components/ui/MoneyCard";
+import DoubleCardSection from "./components/ui/DoubleCardSection";
+import TransactionsSection from "./components/ui/TransactionsSection";
 
 export default function Home() {
   return (
@@ -35,14 +35,14 @@ export default function Home() {
         {/* <TransactionModal
           isOpen={transactionModalOpen}
           onClose={() => {
-            setTransactionModalOpen(false);
-            setSelectedTransaction(undefined);
-          }}
-          onSave={handleSaveTransaction}
-          transaction={selectedTransaction}
-        />
+             setTransactionModalOpen(false);
+             setSelectedTransaction(undefined);
+           }}
+           onSave={handleSaveTransaction}
+           transaction={selectedTransaction}
+         /> */}
 
-        <InvestmentModal
+        {/* <InvestmentModal
           isOpen={investmentModalOpen}
           onClose={() => {
             setInvestmentModalOpen(false);
