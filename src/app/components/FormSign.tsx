@@ -1,12 +1,12 @@
 import React from "react";
 
-interface FormContainerProps {
+interface FormContainerProps extends React.HTMLAttributes<HTMLElement>{
   children: React.ReactNode;
 }
 
-export function FormContainer({ children }: FormContainerProps) {
+export function FormContainer({ children, className }: FormContainerProps) {
   return (
-    <div className="bg-[#29292e] rounded-lg p-8 max-w-[450px] w-[85%] md:w-full mb-6 md:mb-0">
+    <div className={`bg-[#29292e] rounded-lg p-8 max-w-[450px] w-[85%] md:w-full mb-6 md:mb-0 ${className || ""}`}>
       {children}
     </div>
   );

@@ -2,12 +2,11 @@ import { api } from "./api";
 
 interface LoginData {
   email: string;
-
   password: string;
 }
 
 export async function login(data: LoginData) {
-  const response = await api.post("/api/usuarios/login", {
+  const response = await api.post("/usuarios/login", {
         email: data.email,
         senha: data.password,
       });

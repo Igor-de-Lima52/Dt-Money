@@ -10,6 +10,7 @@ import { UserFormData, userSchema } from "../schemas/user-schema";
 import { formatCPF } from "../utils/format-cpf";
 import { removeMask } from "../utils/remove-mask";
 import { createUser } from "../services/user";
+import axios from "axios";
 
 export default function SignUp() {
   const { register, handleSubmit, setValue, watch, formState: { errors } } = useForm<UserFormData>({
@@ -23,14 +24,20 @@ export default function SignUp() {
   async function onSubmit(data: UserFormData) {
     const payload = {
       nome: data.nome,
-      cpf: data.cpf,
+      cpf: removeMask(data.cpf),
       email: data.email,
+      senha: data.password,
       sexo: data.sexo,
-      dataNascimento: `${data.dataNascimento}T00:00:00`,
-      senha: data.password
+      dataNascimento: `${data.dataNascimento}T00:00:00`
     }
 
-    await createUser(payload);
+    try {
+      await createUser(payload);
+    } catch (error) {
+      if (axios.isAxiosError(error)) {
+        console.log(error.response?.data);
+      }
+}
 
     router.push("/signin");
   }
@@ -82,11 +89,11 @@ export default function SignUp() {
               Selecione
             </option>
 
-            <option value="M">
+            <option value="MASCULINO">
               Masculino
             </option>
 
-            <option value="F">
+            <option value="FEMININO">
               Feminino
             </option>
           </select>

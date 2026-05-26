@@ -6,7 +6,7 @@ export interface User {
   nome: string;
   cpf: string;
   email: string;
-  sexo: "M" | "F";
+  sexo: "MASCULINO" | "FEMININO";
   dataNascimento: string;
 }
 
@@ -19,7 +19,7 @@ export interface UpdateUserPayload {
   nome: string;
   cpf: string;
   email: string;
-  sexo: "M" | "F";
+  sexo: "MASCULINO" | "FEMININO";
   dataNascimento: string;
   senha?: string;
 }
@@ -41,16 +41,15 @@ interface CreateUserData {
   nome: string;
   cpf: string;
   email: string;
-  sexo: "M" | "F";
-  dataNascimento: string;
   senha: string;
+  sexo: string;
+  dataNascimento: string;
 }
 
 export async function createUser(
   data: CreateUserData
 ) {
-  const response =
-    await api.post("/usuarios", data);
+  const response = await api.post("/usuarios", data);
 
   return response.data;
 }

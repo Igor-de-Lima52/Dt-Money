@@ -15,7 +15,7 @@ export const userSchema = z
     email: z
       .email("E-mail inválido"),
     
-    sexo: z.enum(["M", "F"],
+    sexo: z.enum(["MASCULINO", "FEMININO"],
       {
         error: "Selecione um sexo",
       }

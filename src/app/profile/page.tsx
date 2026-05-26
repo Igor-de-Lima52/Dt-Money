@@ -1,6 +1,6 @@
 "use client"
 
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { FormContainer, FormDescription, FormSign, FormTitle } from "../components/FormSign";
 import Button from "../components/ui/Button";
 import { InputContainer, LabelContainer } from "../components/ui/Input";
@@ -19,13 +19,9 @@ export default function ProfilePage() {
 
   const { user } = useAuth();
 
-  if(!user) {
-    router.push("/signin");
-  }
-
   const userId = user?.id;
 
-  const { register, handleSubmit, setValue, watch, formState: { errors } } = useForm<UserFormData>({
+  const { register, handleSubmit, setValue, watch, reset, formState: { errors } } = useForm<UserFormData>({
     resolver:
       zodResolver(
         userSchema
@@ -41,24 +37,52 @@ export default function ProfilePage() {
     },
   });
 
-  const [isSubmitting, setIsSubmitting] = useState(false);
-
   function onSubmit(data: UserFormData) {
     const payload: UpdateUserPayload = {
       nome: data.nome,
-      cpf: data.cpf,
+      cpf: removeMask(data.cpf),
       email: data.email,
       sexo: data.sexo,
       dataNascimento: `${data.dataNascimento}T00:00:00`,
       senha: data.password || undefined,
     };
 
-    setIsSubmitting(true);
     mutation.mutate(payload);
+    handleNavigate("/");
   }
 
+  function handleNavigate(route: string) {
+    router.push(route);
+  }
+
+  const { data: userData } = useQuery({
+    queryKey: ["user", userId],
+    queryFn: () => getUserById(userId!),
+    enabled: !!userId,
+  });
+
+  useEffect(() => {
+    if (!userData) return;
+
+    reset({
+      nome: userData.nome,
+      cpf: formatCPF(userData.cpf || ""),
+      email: userData.email,
+      sexo: userData.sexo,
+      dataNascimento: userData.dataNascimento?.split("T")[0],
+      password: "",
+      confirmPassword: "",
+    });
+  }, [userData, reset]);
+
+  useEffect(() => {
+    if (!user) {
+      router.push("/signin");
+    }
+  }, [user, router]);
+
   return (
-    <FormContainer>
+    <FormContainer className="mt-6 md:mt-0">
       <FormTitle>Editar conta</FormTitle>
 
       <FormDescription>Atualize seus dados</FormDescription>
@@ -69,7 +93,7 @@ export default function ProfilePage() {
         )}
         noValidate
       >
-        <div className="mb-4">
+        <div>
           <LabelContainer htmlFor="nome">Nome completo</LabelContainer>
           <InputContainer
             id="nome"
@@ -81,33 +105,34 @@ export default function ProfilePage() {
           {errors.nome?.message && <span className="text-red-700 text-xs">{errors.nome?.message}</span>}
         </div>
 
-        <div className="mb-4">
-          <LabelContainer htmlFor="cpf">CPF</LabelContainer>
-          <InputContainer
-            id="cpf"
-            type="text"
-            placeholder="000.000.000-00"
-            value={formatCPF(cpfValue || "")}
-            onChange={(e) =>
-              setValue("cpf", removeMask(e.target.value))
-            }
-            className={errors.cpf?.message ? "border-red-500" : ""}
-          />
-          {errors.cpf?.message && <span className="text-red-700 text-xs">{errors.cpf?.message}</span>}
+        <div className="flex justify-between items-center gap-2">
+          <div className="w-[50%]">
+            <LabelContainer htmlFor="cpf">CPF</LabelContainer>
+            <InputContainer
+              id="cpf"
+              type="text"
+              value={formatCPF(cpfValue || "")}
+              onChange={(e) =>
+                setValue("cpf", removeMask(e.target.value))
+              }
+              className={errors.cpf?.message ? "border-red-500" : ""}
+            />
+            {errors.cpf?.message && <span className="text-red-700 text-xs">{errors.cpf?.message}</span>}
+          </div>
+
+          <div className="w-[50%]">
+            <LabelContainer htmlFor="birthDate">Data de nascimento</LabelContainer>
+            <InputContainer
+              id="birthDate"
+              type="date"
+              {...register("dataNascimento")}
+              className={errors.dataNascimento?.message ? "border-red-500" : ""}
+            />
+            {errors.dataNascimento?.message && <span className="text-red-700 text-xs">{errors.dataNascimento?.message}</span>}
+          </div>
         </div>
 
-        <div className="mb-4">
-          <LabelContainer htmlFor="birthDate">Data de nascimento</LabelContainer>
-          <InputContainer
-            id="birthDate"
-            type="date"
-            {...register("dataNascimento")}
-            className={errors.dataNascimento?.message ? "border-red-500" : ""}
-          />
-          {errors.dataNascimento?.message && <span className="text-red-700 text-xs">{errors.dataNascimento?.message}</span>}
-        </div>
-
-        <div className="mb-4">
+        <div>
           <LabelContainer htmlFor="email">E-mail</LabelContainer>
           <InputContainer
             id="email"
@@ -119,21 +144,21 @@ export default function ProfilePage() {
           {errors.email?.message && <span className="text-red-700 text-xs">{errors.email?.message}</span>}
         </div>
 
-        <div className="mb-4">
+        <div>
           <LabelContainer htmlFor="sex">Sexo</LabelContainer>
           <select
             id="sex"
             {...register("sexo")}
-            className="w-full bg-[#121214] border border-[#323238] rounded-lg p-4 text-[#e1e1e6]"
+            className="cursor-pointer w-full bg-[#121214] border border-[#323238] rounded-lg p-4 text-[#e1e1e6]"
           >
             <option value="">Selecione</option>
-            <option value="M">Masculino</option>
-            <option value="F">Feminino</option>
+            <option value="MASCULINO">Masculino</option>
+            <option value="FEMININO">Feminino</option>
           </select>
           {errors.sexo?.message && <span className="text-red-700 text-xs">{errors.sexo?.message}</span>}
         </div>
 
-        <div className="mb-4">
+        <div>
           <LabelContainer htmlFor="password">Nova senha</LabelContainer>
           <InputContainer
             id="password"
@@ -145,7 +170,7 @@ export default function ProfilePage() {
           {errors.password?.message && <span className="text-red-700 text-xs">{errors.password?.message}</span>}
         </div>
 
-        <div className="mb-4">
+        <div>
           <LabelContainer htmlFor="confirmPassword">Confirmar senha</LabelContainer>
           <InputContainer
             id="confirmPassword"
@@ -156,10 +181,14 @@ export default function ProfilePage() {
           />
           {errors.confirmPassword?.message && <span className="text-red-700 text-xs">{errors.confirmPassword?.message}</span>}
         </div>
-
-        <Button type="submit" disabled={isSubmitting}>
-          {mutation.isPending ? "Salvando..." : "Salvar alterações"}
-        </Button>
+        <div className="flex justify-between gap-5">
+          <Button type="button" onClick={() => handleNavigate("/")} className="bg-transparent hover:bg-red-700">
+            Cancelar
+          </Button>
+          <Button type="submit" disabled={mutation.isPending}>
+            {mutation.isPending ? "Salvando..." : "Salvar alterações"}
+          </Button>
+        </div>
       </FormSign>
     </FormContainer>
   );
