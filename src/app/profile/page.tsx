@@ -1,65 +1,31 @@
-'use client'
+"use client"
 
-import { useEffect } from "react";
-
-import { useRouter } from "next/navigation";
-
-import { useForm } from "react-hook-form";
-
+import { useState } from "react";
+import { FormContainer, FormDescription, FormSign, FormTitle } from "../components/FormSign";
+import Button from "../components/ui/Button";
+import { InputContainer, LabelContainer } from "../components/ui/Input";
+import { UserFormData, userSchema } from "../schemas/user-schema";
+import { getUserById, updateUser, UpdateUserPayload } from "../services/user";
+import { formatCPF } from "../utils/format-cpf";
+import { removeMask } from "../utils/remove-mask";
+import { useMutation, useQuery } from "@tanstack/react-query";
 import { zodResolver } from "@hookform/resolvers/zod";
-
-import {
-  useMutation,
-  useQuery,
-} from "@tanstack/react-query";
-
-import {
-  userSchema,
-  UserFormData,
-} from "@/app/schemas/user-schema";
-
-import {
-  getUserById,
-  updateUser,
-  UpdateUserPayload,
-} from "@/app/services/user";
-
-import {
-  FormContainer,
-  FormDescription,
-  FormSign,
-  FormTitle,
-} from "@/app/components/FormSign";
-
-import {
-  InputContainer,
-  LabelContainer,
-} from "@/app/components/ui/Input";
-
-import Button from "@/app/components/ui/Button";
-
-import {
-  formatCPF,
-} from "@/app/utils/format-cpf";
-
-import {
-  removeMask,
-} from "@/app/utils/remove-mask";
-
-import {
-  useAuth,
-} from "@/app/contexts/auth-context";
+import { useForm } from "react-hook-form";
+import { useAuth } from "../contexts/auth-context";
+import { useRouter } from "next/navigation";
 
 export default function ProfilePage() {
   const router = useRouter();
 
   const { user } = useAuth();
 
+  if(!user) {
+    router.push("/signin");
+  }
+
   const userId = user?.id;
-  
-  const { data: userData, isLoading } = useQuery({ queryKey: ["user", userId], queryFn: () => getUserById(userId), enabled: !!userId});
-  
-  const { register, handleSubmit, reset, setValue, watch, formState: { errors } } = useForm<UserFormData>({
+
+  const { register, handleSubmit, setValue, watch, formState: { errors } } = useForm<UserFormData>({
     resolver:
       zodResolver(
         userSchema
@@ -68,319 +34,130 @@ export default function ProfilePage() {
 
   const cpfValue = watch("cpf");
 
+  const mutation = useMutation({
+    mutationFn: async (data: UpdateUserPayload) => {
+      const updatedUser = await updateUser(userId!, data);
+      return updatedUser;
+    },
+  });
 
-  useEffect(() => {
-    if (!userData) return;
-
-    reset({
-      name:
-        userData.name,
-
-      cpf:
-        userData.cpf,
-
-      email:
-        userData.email,
-
-      sex:
-        userData.sex,
-
-      birthDate:
-        userData.birthDate?.split(
-          "T"
-        )[0],
-
-      password: "",
-
-      confirmPassword:
-        "",
-    });
-  }, [userData, reset]);
-
-  const mutation = useMutation({mutationFn: (data: UpdateUserPayload) => updateUser(userId!, data)});
+  const [isSubmitting, setIsSubmitting] = useState(false);
 
   function onSubmit(data: UserFormData) {
     const payload: UpdateUserPayload = {
-      nome: data.name,
+      nome: data.nome,
       cpf: data.cpf,
       email: data.email,
-      sexo: data.sex,
-      dataNascimento: `${data.birthDate}T00:00:00`,
+      sexo: data.sexo,
+      dataNascimento: `${data.dataNascimento}T00:00:00`,
       senha: data.password || undefined,
     };
 
+    setIsSubmitting(true);
     mutation.mutate(payload);
-  }
-
-  if (isLoading) {
-    return (
-      <p>
-        Carregando...
-      </p>
-    );
   }
 
   return (
     <FormContainer>
-      <FormTitle>
-        Editar conta
-      </FormTitle>
+      <FormTitle>Editar conta</FormTitle>
 
-      <FormDescription>
-        Atualize seus dados
-      </FormDescription>
+      <FormDescription>Atualize seus dados</FormDescription>
 
       <FormSign
         onSubmit={handleSubmit(
           onSubmit
         )}
-
         noValidate
       >
-        <div>
-          <LabelContainer htmlFor="name">
-            Nome completo
-          </LabelContainer>
-
+        <div className="mb-4">
+          <LabelContainer htmlFor="nome">Nome completo</LabelContainer>
           <InputContainer
-            id="name"
+            id="nome"
             type="text"
             placeholder="Seu nome"
-
-            {...register(
-              "name"
-            )}
-
-            className={
-              errors.name
-                ? "border-red-500"
-                : ""
-            }
+            {...register("nome", { required: true })}
+            className={errors.nome?.message ? "border-red-500" : ""}
           />
-
-          {errors.name && (
-            <span className="text-red-700 text-xs">
-              {
-                errors.name
-                  .message
-              }
-            </span>
-          )}
+          {errors.nome?.message && <span className="text-red-700 text-xs">{errors.nome?.message}</span>}
         </div>
 
-        <div className="flex gap-2">
-          <div className="w-full">
-            <LabelContainer htmlFor="cpf">
-              CPF
-            </LabelContainer>
-
-            <InputContainer
-              id="cpf"
-              type="text"
-              placeholder="000.000.000-00"
-
-              value={formatCPF(
-                cpfValue || ""
-              )}
-
-              onChange={(e) =>
-                setValue(
-                  "cpf",
-
-                  removeMask(
-                    e.target.value
-                  )
-                )
-              }
-
-              className={
-                errors.cpf
-                  ? "border-red-500"
-                  : ""
-              }
-            />
-
-            {errors.cpf && (
-              <span className="text-red-700 text-xs">
-                {
-                  errors.cpf
-                    .message
-                }
-              </span>
-            )}
-          </div>
-
-          <div className="w-full">
-            <LabelContainer htmlFor="birthDate">
-              Data nascimento
-            </LabelContainer>
-
-            <InputContainer
-              id="birthDate"
-              type="date"
-
-              {...register(
-                "birthDate"
-              )}
-
-              className={
-                errors.birthDate
-                  ? "border-red-500"
-                  : ""
-              }
-            />
-
-            {errors.birthDate && (
-              <span className="text-red-700 text-xs">
-                {
-                  errors
-                    .birthDate
-                    .message
-                }
-              </span>
-            )}
-          </div>
+        <div className="mb-4">
+          <LabelContainer htmlFor="cpf">CPF</LabelContainer>
+          <InputContainer
+            id="cpf"
+            type="text"
+            placeholder="000.000.000-00"
+            value={formatCPF(cpfValue || "")}
+            onChange={(e) =>
+              setValue("cpf", removeMask(e.target.value))
+            }
+            className={errors.cpf?.message ? "border-red-500" : ""}
+          />
+          {errors.cpf?.message && <span className="text-red-700 text-xs">{errors.cpf?.message}</span>}
         </div>
 
-        <div>
-          <LabelContainer htmlFor="email">
-            E-mail
-          </LabelContainer>
+        <div className="mb-4">
+          <LabelContainer htmlFor="birthDate">Data de nascimento</LabelContainer>
+          <InputContainer
+            id="birthDate"
+            type="date"
+            {...register("dataNascimento")}
+            className={errors.dataNascimento?.message ? "border-red-500" : ""}
+          />
+          {errors.dataNascimento?.message && <span className="text-red-700 text-xs">{errors.dataNascimento?.message}</span>}
+        </div>
 
+        <div className="mb-4">
+          <LabelContainer htmlFor="email">E-mail</LabelContainer>
           <InputContainer
             id="email"
             type="email"
             placeholder="seu@email.com"
-
-            {...register(
-              "email"
-            )}
-
-            className={
-              errors.email
-                ? "border-red-500"
-                : ""
-            }
+            {...register("email")}
+            className={errors.email?.message ? "border-red-500" : ""}
           />
-
-          {errors.email && (
-            <span className="text-red-700 text-xs">
-              {
-                errors.email
-                  .message
-              }
-            </span>
-          )}
+          {errors.email?.message && <span className="text-red-700 text-xs">{errors.email?.message}</span>}
         </div>
 
-        <div>
-          <LabelContainer htmlFor="sex">
-            Sexo
-          </LabelContainer>
-
+        <div className="mb-4">
+          <LabelContainer htmlFor="sex">Sexo</LabelContainer>
           <select
             id="sex"
-
-            {...register(
-              "sex"
-            )}
-
-            className="
-              w-full
-              bg-[#121214]
-              border
-              border-[#323238]
-              rounded-lg
-              p-4
-              text-[#e1e1e6]
-            "
+            {...register("sexo")}
+            className="w-full bg-[#121214] border border-[#323238] rounded-lg p-4 text-[#e1e1e6]"
           >
-            <option value="">
-              Selecione
-            </option>
-
-            <option value="M">
-              Masculino
-            </option>
-
-            <option value="F">
-              Feminino
-            </option>
+            <option value="">Selecione</option>
+            <option value="M">Masculino</option>
+            <option value="F">Feminino</option>
           </select>
-
-          {errors.sex && (
-            <span className="text-red-700 text-xs">
-              {
-                errors.sex
-                  .message
-              }
-            </span>
-          )}
+          {errors.sexo?.message && <span className="text-red-700 text-xs">{errors.sexo?.message}</span>}
         </div>
 
-        <div>
-          <LabelContainer htmlFor="password">
-            Nova senha
-          </LabelContainer>
-
+        <div className="mb-4">
+          <LabelContainer htmlFor="password">Nova senha</LabelContainer>
           <InputContainer
             id="password"
             type="password"
             placeholder="••••••••"
-
-            {...register(
-              "password"
-            )}
-
-            className={
-              errors.password
-                ? "border-red-500"
-                : ""
-            }
+            {...register("password")}
+            className={errors.password?.message ? "border-red-500" : ""}
           />
-
-          {errors.password && (
-            <span className="text-red-700 text-xs">
-              {
-                errors.password
-                  .message
-              }
-            </span>
-          )}
+          {errors.password?.message && <span className="text-red-700 text-xs">{errors.password?.message}</span>}
         </div>
 
-        <div>
-          <LabelContainer htmlFor="confirmPassword">
-            Confirmar senha
-          </LabelContainer>
-
+        <div className="mb-4">
+          <LabelContainer htmlFor="confirmPassword">Confirmar senha</LabelContainer>
           <InputContainer
             id="confirmPassword"
             type="password"
             placeholder="••••••••"
-
-            {...register(
-              "confirmPassword"
-            )}
-
-            className={
-              errors
-                .confirmPassword
-                ? "border-red-500"
-                : ""
-            }
+            {...register("confirmPassword")}
+            className={errors.confirmPassword?.message ? "border-red-500" : ""}
           />
-
-          {errors.confirmPassword && (
-            <span className="text-red-700 text-xs">
-              {
-                errors.confirmPassword.message
-              }
-            </span>
-          )}
+          {errors.confirmPassword?.message && <span className="text-red-700 text-xs">{errors.confirmPassword?.message}</span>}
         </div>
 
-        <Button type="submit">
+        <Button type="submit" disabled={isSubmitting}>
           {mutation.isPending ? "Salvando..." : "Salvar alterações"}
         </Button>
       </FormSign>

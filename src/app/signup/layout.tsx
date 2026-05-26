@@ -20,7 +20,7 @@ export default function SignUpLayout({
 }>) {
   return (
     <>
-      <Image src="/logo.svg" alt="DT Money" width={200} height={50} className="mb-6 -ml-8 w-auto h-8 md:h-auto mt-6 md:mt-0" />
+      <Image src="/logo.svg" alt="DT Money" width={200} height={50} className="mb-6 -ml-8 w-auto h-8 md:h-auto mt-6 md:mt-0" loading={"lazy"} />
       {children}
     </>
   );

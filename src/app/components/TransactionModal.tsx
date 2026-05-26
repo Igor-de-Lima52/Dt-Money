@@ -3,6 +3,8 @@ import { Transaction, TransactionType } from "../types";
 import { LuX } from "react-icons/lu";
 import { FiArrowDownCircle, FiArrowUpCircle } from "react-icons/fi";
 
+// NADA FUNCIONANDO - - - -
+
 interface TransactionModalProps {
   // isOpen: boolean;
   // onClose: () => void;

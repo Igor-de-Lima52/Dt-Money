@@ -18,10 +18,10 @@ export default function SignInLayout({
 }: Readonly<{
   children: React.ReactNode;
 }>) {
-  return (
-      <>
-        <Image src="/logo.svg" alt="DT Money" width={200} height={50} className="mb-10 -ml-8 w-auto h-8 md:h-auto" />
-        {children}
-      </>
+  return (  
+    <>
+      <Image src="/logo.svg" alt="DT Money" width={200} height={50} className="mb-10 -ml-8 w-auto h-8 md:h-auto" loading="lazy" />
+      {children}
+    </>
   );
 }

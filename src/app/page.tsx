@@ -1,9 +1,29 @@
+"use client";
+
 import Header from "./components/Header";
 import MoneyCard from "./components/ui/MoneyCard";
 import DoubleCardSection from "./components/ui/DoubleCardSection";
 import TransactionsSection from "./components/ui/TransactionsSection";
+import { useAuth } from "./contexts/auth-context";
+import { useRouter } from "next/navigation";
+import { useEffect } from "react";
 
 export default function Home() {
+  const router = useRouter();
+  
+  const { user } = useAuth();
+   
+  // if(!user) {
+  //   router.replace("/signin");
+  // }
+
+  useEffect(() => {
+    if (!user) {
+      router.replace("/signin");
+    }
+  }, [user, router]);
+
+
   return (
     <div className="h-full bg-[#121214] w-full">
       <Header />
@@ -16,18 +36,6 @@ export default function Home() {
           <MoneyCard title="Total" amount={2000} />
         </section>
 
-        {/* New Transaction Button */}
-        {/* <div className="flex justify-end mb-6">
-          <button
-            onClick={() => {
-              setSelectedTransaction(undefined);
-              setTransactionModalOpen(true);
-            }}
-            className="bg-[#00b37e] hover:bg-[#00875f] transition-colors text-white font-['Roboto:Bold',sans-serif] px-6 py-3 rounded-[6px] flex items-center gap-2"
-          >
-            Nova transação
-          </button>
-        </div> */}
         <DoubleCardSection />
         <TransactionsSection />
 

@@ -11,7 +11,7 @@ export interface Transaction {
 
 export interface Investment {
   id: string;
-  name: string;
+  nome: string;
   amount: number;
   type: string;
   date: string;
@@ -19,7 +19,7 @@ export interface Investment {
 
 export interface Goal {
   id: string;
-  name: string;
+  nome: string;
   targetAmount: number;
   currentAmount: number;
   deadline: string;

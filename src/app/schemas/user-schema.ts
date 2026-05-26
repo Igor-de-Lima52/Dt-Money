@@ -2,7 +2,7 @@ import { z } from "zod";
 
 export const userSchema = z
   .object({
-    name: z
+    nome: z
       .string()
       .min(3, "Nome obrigatório"),
 
@@ -15,13 +15,13 @@ export const userSchema = z
     email: z
       .email("E-mail inválido"),
     
-    sex: z.enum(["M", "F"],
+    sexo: z.enum(["M", "F"],
       {
         error: "Selecione um sexo",
       }
     ),
 
-    birthDate: z
+    dataNascimento: z
       .string()
       .min(1, "Data obrigatória"),
 

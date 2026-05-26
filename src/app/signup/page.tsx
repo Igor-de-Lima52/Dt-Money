@@ -22,11 +22,11 @@ export default function SignUp() {
 
   async function onSubmit(data: UserFormData) {
     const payload = {
-      nome: data.name,
+      nome: data.nome,
       cpf: data.cpf,
       email: data.email,
-      sexo: data.sex,
-      dataNascimento: `${data.birthDate}T00:00:00`,
+      sexo: data.sexo,
+      dataNascimento: `${data.dataNascimento}T00:00:00`,
       senha: data.password
     }
 
@@ -47,9 +47,9 @@ export default function SignUp() {
       <FormSign onSubmit={handleSubmit(onSubmit)} noValidate>
         <div>
           <LabelContainer htmlFor="name">Nome completo</LabelContainer>
-          <InputContainer placeholder="Seu nome" type="text" required id="name" {...register("name")} className={`${errors.name ? "border-red-500" : ""}`} />
-          {errors.name && (
-            <span className="text-red-700 text-xs">{errors.name.message}</span>
+          <InputContainer placeholder="Seu nome" type="text" required id="name" {...register("nome")} className={`${errors.nome ? "border-red-500" : ""}`} />
+          {errors.nome && (
+            <span className="text-red-700 text-xs">{errors.nome.message}</span>
           )}
         </div>
         <div className="flex justify-between items-center gap-2">
@@ -62,9 +62,9 @@ export default function SignUp() {
           </div>
           <div className="w-[50%]">
             <LabelContainer htmlFor="birthDate">Data de nascimento</LabelContainer>
-            <InputContainer id="birthDate" type="date" {...register("birthDate")} className={`${errors.birthDate ? "border-red-500" : ""} w-[50%]`} />
-            {errors.birthDate && (
-              <span className="text-red-700 text-xs">{errors.birthDate.message}</span>
+            <InputContainer id="birthDate" type="date" {...register("dataNascimento")} className={`${errors.dataNascimento ? "border-red-500" : ""} w-[50%]`} />
+            {errors.dataNascimento && (
+              <span className="text-red-700 text-xs">{errors.dataNascimento.message}</span>
             )}
           </div>
         </div>
@@ -77,7 +77,7 @@ export default function SignUp() {
         </div>
         <div>
           <LabelContainer htmlFor="sex">Sexo</LabelContainer>
-          <select id="sex" {...register("sex")} className="cursor-pointer w-full bg-[#121214] border border-[#323238] rounded-lg p-4 text-[#e1e1e6]">
+          <select id="sex" {...register("sexo")} className="cursor-pointer w-full bg-[#121214] border border-[#323238] rounded-lg p-4 text-[#e1e1e6]">
             <option value="">
               Selecione
             </option>
@@ -91,9 +91,9 @@ export default function SignUp() {
             </option>
           </select>
 
-          {errors.sex && (
+          {errors.sexo && (
             <span className="text-red-700 text-xs">
-              {errors.sex.message}
+              {errors.sexo.message}
             </span>
           )}
         </div>
