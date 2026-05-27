@@ -1,52 +1,77 @@
-import { AlertTriangle } from "lucide-react";
+"use client";
+
+import { LuTriangle, LuLoader, LuX } from "react-icons/lu";
+import { useState } from "react";
 
 interface DeleteConfirmModalProps {
   isOpen: boolean;
   onClose: () => void;
-  onConfirm: () => void;
-  title: string;
-  message: string;
+  onConfirm: () => Promise<void>;
+  title?: string;
+  message?: string;
 }
 
-export default function DeleteConfirmModal({ isOpen, onClose, onConfirm, title, message }: DeleteConfirmModalProps) {
+export default function DeleteConfirmModal({
+  isOpen,
+  onClose,
+  onConfirm,
+  title = "Confirmar exclusão",
+  message = "Tem certeza? Esta ação não pode ser desfeita.",
+}: DeleteConfirmModalProps) {
+  const [deleting, setDeleting] = useState(false);
+
+  const handleConfirm = async () => {
+    setDeleting(true);
+    try {
+      await onConfirm();
+      onClose();
+    } finally {
+      setDeleting(false);
+    }
+  };
+
   if (!isOpen) return null;
 
   return (
-    <div className="fixed inset-0 bg-[rgba(0,0,0,0.75)] flex items-center justify-center z-50 p-4" onClick={onClose}>
+    <div
+      className="fixed inset-0 bg-[rgba(0,0,0,0.75)] flex items-center justify-center z-50 p-4"
+      onClick={onClose}
+    >
       <div
-        className="bg-[#202024] rounded-[6px] shadow-[0px_4px_32px_0px_rgba(0,0,0,0.8)] w-full max-w-[400px] p-6"
+        className="bg-[#202024] rounded-[6px] shadow-[0px_4px_32px_0px_rgba(0,0,0,0.8)] w-full max-w-[420px] p-8"
         onClick={(e) => e.stopPropagation()}
       >
-        <div className="flex flex-col items-center text-center gap-4">
-          <div className="w-12 h-12 rounded-full bg-[#f75a68] bg-opacity-10 flex items-center justify-center">
-            <AlertTriangle className="w-6 h-6 text-[#f75a68]" />
+        <div className="flex items-start justify-between mb-6">
+          <div className="flex items-center gap-3">
+            <LuTriangle className="w-6 h-6 text-[#f75a68] shrink-0" />
+            <h2 className="font-bold text-[#e1e1e6] text-xl">{title}</h2>
           </div>
-          
-          <h2 className="font-['Roboto:Bold',sans-serif] font-bold text-[#e1e1e6] text-xl" style={{ fontVariationSettings: "'wdth' 100" }}>
-            {title}
-          </h2>
-          
-          <p className="font-['Roboto:Regular',sans-serif] text-[#c4c4cc] text-sm">
-            {message}
-          </p>
+          <button onClick={onClose} className="cursor-pointer text-[#7c7c8a] hover:text-[#c4c4cc] transition-colors">
+            <LuX className="w-5 h-5" />
+          </button>
+        </div>
 
-          <div className="flex gap-3 w-full mt-4">
-            <button
-              onClick={onClose}
-              className="flex-1 bg-[#323238] hover:bg-[#29292e] transition-colors text-[#c4c4cc] font-['Roboto:Bold',sans-serif] font-bold py-3 rounded-[6px]"
-            >
-              Cancelar
-            </button>
-            <button
-              onClick={() => {
-                onConfirm();
-                onClose();
-              }}
-              className="flex-1 bg-[#f75a68] hover:bg-[#e74856] transition-colors text-white font-['Roboto:Bold',sans-serif] font-bold py-3 rounded-[6px]"
-            >
-              Excluir
-            </button>
-          </div>
+        <p className="text-[#7c7c8a] mb-8">{message}</p>
+
+        <div className="flex gap-3">
+          <button
+            onClick={onClose}
+            disabled={deleting}
+            className="cursor-pointer flex-1 bg-[#29292e] hover:bg-[#323238] transition-colors text-[#c4c4cc] font-bold py-3 rounded-[6px]"
+          >
+            Cancelar
+          </button>
+          <button
+            onClick={handleConfirm}
+            disabled={deleting}
+            className="cursor-pointer flex-1 bg-[#f75a68] hover:bg-[#e74856] transition-colors text-white font-bold py-3 rounded-[6px] disabled:opacity-50 flex items-center justify-center gap-2"
+          >
+            {deleting ? (
+              <><LuLoader className="w-5 h-5 animate-spin" /> Excluindo...</>
+            ) : (
+              "Excluir"
+            )}
+          </button>
         </div>
       </div>
     </div>

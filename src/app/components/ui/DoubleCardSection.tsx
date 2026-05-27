@@ -8,7 +8,7 @@ export default function DoubleCardSection() {
           {/* R$ {investment.amount.toFixed(2).replace(".", ",")} */} R$ 5.000,00
         </p>
       </BigCard>
-      
+
       <BigCard title="Metas" subtitle="Casamento" info="">
         <div className="flex justify-between text-sm">
           <span className="text-[#c4c4cc] text-lg">
@@ -20,7 +20,7 @@ export default function DoubleCardSection() {
         </div>
         <div className="w-full bg-[#121214] rounded-full h-2">
           <div className="bg-[#00b37e] h-2 rounded-full transition-all"
-              //style={{ width: `${Math.min(progress, 100)}%` }}
+          //style={{ width: `${Math.min(progress, 100)}%` }}
           />
         </div>
         <p className="text-[#00b37e] text-sm mt-2">

@@ -9,21 +9,35 @@ interface AuthContextData {
   signIn: (email: string, password: string) => Promise<void>;
   signOut: () => void;
   updateUser: (userData: User) => void;
+  loading: boolean;
   isAuthenticated: boolean;
 }
 
 const AuthContext = createContext({} as AuthContextData);
 
 export function AuthProvider({children}: {children: React.ReactNode}) {
-  const [user, setUser] = useState<User | null>(() => {
-    if (typeof window === "undefined") {
-      return null;
-    }
+  // const [user, setUser] = useState<User | null>(() => {
+  //   if (typeof window === "undefined") {
+  //     return null;
+  //   }
 
-    const storedUser = localStorage.getItem("user");
+  //   const storedUser = localStorage.getItem("user");
 
-    return storedUser ? JSON.parse(storedUser) : null;
-  });
+  //   return storedUser ? JSON.parse(storedUser) : null;
+  // });
+
+  const [user, setUser] = useState<User | null>(null);
+const [loading, setLoading] = useState(true);
+
+useEffect(() => {
+  const storedUser = localStorage.getItem("user");
+
+  if (storedUser) {
+    setUser(JSON.parse(storedUser));
+  }
+
+  setLoading(false);
+}, []);
 
   async function signIn(email: string, password: string) {
     const user = await login({ email, password });
@@ -53,7 +67,7 @@ export function AuthProvider({children}: {children: React.ReactNode}) {
   }
 
   return (
-    <AuthContext.Provider value={{user, signIn, signOut, updateUser, isAuthenticated: !!user}}>
+    <AuthContext.Provider value={{user, signIn, signOut, updateUser, loading, isAuthenticated: !!user}}>
       {children}
     </AuthContext.Provider>
   );
